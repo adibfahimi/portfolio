@@ -307,4 +307,4 @@ That concludes this article. You can further enhance this project by adding feat
 for POST, PUT, DELETE methods, implementing a `Static()` function to serve static files, and more.
 
 Feel free to explore additional features on my GitHub repository [Muick](https://github.com/adibfahimi/muick).
-tps://github.com/adibfahimi/muick) with more feutures
+with more feutures
