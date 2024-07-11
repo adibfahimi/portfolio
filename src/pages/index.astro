@@ -1,0 +1,140 @@
+---
+import Layout from "../layouts/Layout.astro";
+import FloatingBox from "../components/SmallBox.astro";
+import { Picture } from "astro:assets";
+import { ConfigEN } from "../config";
+import { getCollection } from "astro:content";
+import iconImage from "../assets/icon.png";
+
+const years = () => {
+  const start = new Date(ConfigEN.me.started);
+  const now = new Date();
+  return now.getFullYear() - start.getFullYear();
+};
+
+const posts = (await getCollection("posts")).sort(function (
+  first: any,
+  second: any,
+) {
+  return second.data.publishedAt.getTime() - first.data.publishedAt.getTime();
+});
+---
+
+<Layout>
+  <main>
+    <div class="flex flex-col gap-20">
+      <article class="md:flex-row-reverse md:justify-end md:gap-12">
+        <div class="flex flex-row justify-between sm:grid-cols-3">
+          <div class="col-span-2 flex flex-col gap-6 md:gap-8 my-auto">
+            <h1 class="text-3xl">Hi, I am {ConfigEN.me.name.split(" ")[0]}</h1>
+            <h2 class="w-auto sm:w-[85%] md:w-[90%] leading-6">
+              I am a <strong class="font-normal text-primary"
+                >{ConfigEN.me.job}</strong
+              > with over
+              <strong class="font-normal text-primary">{years} years</strong>
+              of experience. Currently, I am working with<strong
+                class="font-normal text-primary"
+              >
+                {ConfigEN.me.stack}</strong
+              >. Outside of programming, I enjoy {ConfigEN.me.hobby}.
+            </h2>
+            <div class="custom-breadcrumbs">
+              <ul>
+                {
+                  Object.keys(ConfigEN.socials).map((social) => (
+                    <li>
+                      <a
+                        href={
+                          ConfigEN.socials[
+                            social as keyof typeof ConfigEN.socials
+                          ]
+                        }
+                        rel="noreferrer"
+                        target="_blank"
+                      >
+                        {social.charAt(0).toUpperCase() + social.slice(1)}
+                      </a>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          </div>
+          <div class="ml-auto hidden sm:block">
+            <div class="avatar">
+              <div class="w-60 rounded">
+                <Picture
+                  src={iconImage}
+                  formats={["avif", "webp"]}
+                  alt="Profile icon"
+                  loading="eager"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="flex flex-col gap-8">
+        <header class="flex w-full flex-row justify-between gap-2">
+          <h3 class="text-lg">Selected Projects</h3>
+          <a
+            href={ConfigEN.me.projectLink}
+            class="text-sm text-primary underline decoration-dashed underline-offset-8"
+            target="_self"
+            rel="noreferrer"
+            >View All Projects
+          </a>
+        </header>
+        <section
+          class="grid grid-cols-1 gap-4 sm:grid-cols-2 justify-center items-stretch"
+        >
+          {
+            Object.keys(ConfigEN.projects).map((project) => (
+              <FloatingBox
+                title={project}
+                href={
+                  ConfigEN.projects[project as keyof typeof ConfigEN.projects]
+                    .url
+                }
+                tags={
+                  ConfigEN.projects[project as keyof typeof ConfigEN.projects]
+                    .tags
+                }
+                description={
+                  ConfigEN.projects[project as keyof typeof ConfigEN.projects]
+                    .description
+                }
+              />
+            ))
+          }
+        </section>
+      </article>
+
+      <article class="flex flex-col gap-8">
+        <header class="flex w-full flex-row justify-between gap-2">
+          <h3 class="text-lg">Latest Posts</h3>
+          <a
+            href="/posts"
+            class="text-sm text-primary underline decoration-dashed underline-offset-8"
+            rel="noreferrer"
+            >View All Posts
+          </a>
+        </header>
+        <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 mx-auto">
+          {
+            posts.map((post: any) => (
+              <FloatingBox
+                title={post.data.title}
+                publishedAt={post.data.publishedAt.toDateString()}
+                tags={post.data.tags}
+                description={post.data.description}
+                href={"/posts/" + post.slug}
+              />
+            ))
+          }
+        </section>
+      </article>
+    </div>
+  </main>
+</Layout>
