@@ -1,0 +1,142 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import FloatingBox from "../../components/SmallBox.astro";
+import { Picture } from "astro:assets";
+import iconImage from "../../assets/icon.png";
+import { ConfigDE } from "./config-de";
+
+const years = () => {
+  const start = new Date(ConfigDE.me.started);
+  const now = new Date();
+  return now.getFullYear() - start.getFullYear();
+};
+
+import { getCollection } from "astro:content";
+const posts = (await getCollection("posts")).sort(function (
+  first: any,
+  second: any
+) {
+  return second.data.publishedAt.getTime() - first.data.publishedAt.getTime();
+});
+---
+
+<Layout>
+  <main>
+    <div class="flex flex-col gap-20">
+      <article class="md:flex-row-reverse md:justify-end md:gap-12">
+        <div class="flex flex-row justify-between sm:grid-cols-3">
+          <div class="col-span-2 flex flex-col gap-6 md:gap-8 my-auto">
+            <h1 class="text-3xl">
+              Hi, ich bin {ConfigDE.me.name.split(" ")[0]}
+            </h1>
+            <h2 class="w-auto sm:w-[85%] md:w-[90%] leading-6">
+              Ich bin ein <strong class="font-normal text-primary"
+                >{ConfigDE.me.job}</strong
+              > mit über
+              <strong class="font-normal text-primary">{years} Jahren</strong>
+              Erfahrung. Derzeit arbeite ich mit<strong
+                class="font-normal text-primary"
+              >
+                {ConfigDE.me.stack}</strong
+              >. Außerhalb des Programmierens mag ich {ConfigDE.me.hobby}.
+            </h2>
+            <div class="custom-breadcrumbs">
+              <ul>
+                {
+                  Object.keys(ConfigDE.socials).map((social) => (
+                    <li>
+                      <a
+                        href={
+                          ConfigDE.socials[
+                            social as keyof typeof ConfigDE.socials
+                          ]
+                        }
+                        rel="noreferrer"
+                        target="_blank"
+                      >
+                        {social.charAt(0).toUpperCase() + social.slice(1)}
+                      </a>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          </div>
+          <div class="ml-auto hidden sm:block">
+            <div class="avatar">
+              <div class="w-60 rounded">
+                <Picture
+                  src={iconImage}
+                  formats={["avif", "webp"]}
+                  alt="Profile icon"
+                  loading="eager"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="flex flex-col gap-8">
+        <header class="flex w-full flex-row justify-between gap-2">
+          <h3 class="text-lg">Ausgewählte Projekte</h3>
+          <a
+            href={ConfigDE.me.projectLink}
+            class="text-sm text-primary underline decoration-dashed underline-offset-8"
+            target="_self"
+            rel="noreferrer"
+            >Alle Projekte ansehen
+          </a>
+        </header>
+        <section
+          class="grid grid-cols-1 gap-4 sm:grid-cols-2 justify-center items-stretch"
+        >
+          {
+            Object.keys(ConfigDE.projects).map((project) => (
+              <FloatingBox
+                title={project}
+                href={
+                  ConfigDE.projects[project as keyof typeof ConfigDE.projects]
+                    .url
+                }
+                tags={
+                  ConfigDE.projects[project as keyof typeof ConfigDE.projects]
+                    .tags
+                }
+                description={
+                  ConfigDE.projects[project as keyof typeof ConfigDE.projects]
+                    .description
+                }
+              />
+            ))
+          }
+        </section>
+      </article>
+
+      <article class="flex flex-col gap-8">
+        <header class="flex w-full flex-row justify-between gap-2">
+          <h3 class="text-lg">Neueste Beiträge</h3>
+          <a
+            href="/posts"
+            class="text-sm text-primary underline decoration-dashed underline-offset-8"
+            rel="noreferrer"
+            >Alle Beiträge ansehen
+          </a>
+        </header>
+        <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 mx-auto">
+          {
+            posts.map((post: any) => (
+              <FloatingBox
+                title={post.data.title}
+                publishedAt={post.data.publishedAt.toDateString()}
+                tags={post.data.tags}
+                description={post.data.description}
+                href={"/posts/" + post.slug}
+              />
+            ))
+          }
+        </section>
+      </article>
+    </div>
+  </main>
+</Layout>
